@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { AppState, ROSTER_PLAYERS, FORMATION_CONFIG, ScorecardState, MatchDayState } from "../types";
 
@@ -10,11 +9,12 @@ const getAiClient = async () => {
     if (!hasKey) {
        await win.aistudio.openSelectKey();
     }
-  } else {
-      if (!process.env.API_KEY) {
-          throw new Error("API Key missing. Please select a key.");
-      }
   }
+  
+  if (!process.env.API_KEY) {
+      throw new Error("API Key missing. Please select a key.");
+  }
+  
   return new GoogleGenAI({ apiKey: process.env.API_KEY });
 }
 
