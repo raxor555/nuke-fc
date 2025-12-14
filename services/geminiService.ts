@@ -230,7 +230,14 @@ LAYOUT — TOP TO BOTTOM
 
 5. BOTTOM EXTENSION (deep emerald-to-black with subtle dragon-scale texture)
    • Centred footer in small metallic-gold: "NUKE FC 2025"
+ 
+6. FACE PRESERVATION — NON-NEGOTIABLE
+Do NOT alter, enhance, beautify, stylize, morph, regenerate, relight, or reinterpret any player’s face.
+Faces must remain 100% identical to the input image, same structure, expression, skin texture, age, and identity.
+No AI face correction, no symmetry fixes, no sharpening, no smoothing, no reconstruction.
+Treat faces as locked photographic truth. Only global lighting and environment may change around them.
 
+Any deviation from the original face is unacceptable.
 FINISHING
 - Photorealistic logo integration and lighting
 - Luxury broadcast lens flares, anamorphic streaks, subtle film grain
