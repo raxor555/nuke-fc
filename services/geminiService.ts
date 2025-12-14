@@ -286,12 +286,17 @@ export const generateMatchDayImage = async (state: MatchDayState): Promise<strin
     
     COMPOSITION:
     
-    1. THE PLAYERS (Left/Center focus):
-    Create a vertical stack or dynamic cluster of 3 players based on the Input Images provided.
+    1. THE PLAYERS / TEAM GEAR (Left/Center focus):
+
+    If player source images are provided in INPUT IMAGES above: 
+    - Create a vertical stack or dynamic cluster of 3 players based on the Input Images provided.
     - IDENTITY: Strictly preserve the faces of the uploaded players. This is a face-swap request.
     - ATTIRE: ${kitInstruction}
     - Style: Present them as cut-out figures or "polaroid" snapshots taped onto the background.
     - Poses: Arms crossed, pointing, or shouting - aggressive & passionate match day energy.
+
+    If NO player source images are provided:
+    - Depict a realistic locker room scene. A Nuke FC jersey (deep emerald green with gold accents, matching the specified kit style) is folded over a wooden bench, next to a pair of worn football boots and a duffel bag. The items are draped with ripped tape and paper textures.
     
     2. TYPOGRAPHY (Right/Top focus):
     - Massive, distressed, texture-heavy text reading "GAME DAY".

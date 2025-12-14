@@ -131,7 +131,7 @@ export const MatchDayGenerator: React.FC<Props> = ({ onBack }) => {
             {/* Player Images Section */}
             <div>
                <label className="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-4 block">
-                 Select 3 Stars (Required)
+                 Select 3 Stars (Optional)
                </label>
                <div className="grid grid-cols-3 gap-3">
                  {([1, 2, 3] as const).map((i) => {
