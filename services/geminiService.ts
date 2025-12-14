@@ -1,6 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 import { AppState, ROSTER_PLAYERS, FORMATION_CONFIG, ScorecardState, MatchDayState } from "../types";
 
+// Strict Face Preservation Rule
+const FACE_PRESERVATION_RULE = `
+FACE PRESERVATION — NON-NEGOTIABLE
+Do NOT alter, enhance, beautify, stylize, morph, regenerate, relight, or reinterpret any player’s face.
+Faces must remain 100% identical to the input image, same structure, expression, skin texture, age, and identity.
+No AI face correction, no symmetry fixes, no sharpening, no smoothing, no reconstruction.
+Treat faces as locked photographic truth. Only global lighting and environment may change around them.
+Any deviation from the original face is unacceptable.
+`;
+
 // Helper to check API Key
 const getAiClient = async () => {
   const win = window as any;
@@ -126,6 +136,8 @@ export const generateLineupImage = async (state: AppState): Promise<string> => {
     Gold particles floating in the air above the jerseys.
     The jerseys and text must be legible, sharp, and look like professional graphic design elements.
     Focus on creating a premium, editorial "Lineup Reveal" graphic that showcases the team formation through realistic kit visualization.
+
+    ${FACE_PRESERVATION_RULE}
   `;
 
   return await callGemini(ai, prompt, imagesToBESent);
@@ -231,13 +243,8 @@ LAYOUT — TOP TO BOTTOM
 5. BOTTOM EXTENSION (deep emerald-to-black with subtle dragon-scale texture)
    • Centred footer in small metallic-gold: "NUKE FC 2025"
  
-6. FACE PRESERVATION — NON-NEGOTIABLE
-Do NOT alter, enhance, beautify, stylize, morph, regenerate, relight, or reinterpret any player’s face.
-Faces must remain 100% identical to the input image, same structure, expression, skin texture, age, and identity.
-No AI face correction, no symmetry fixes, no sharpening, no smoothing, no reconstruction.
-Treat faces as locked photographic truth. Only global lighting and environment may change around them.
+${FACE_PRESERVATION_RULE}
 
-Any deviation from the original face is unacceptable.
 FINISHING
 - Photorealistic logo integration and lighting
 - Luxury broadcast lens flares, anamorphic streaks, subtle film grain
@@ -331,6 +338,8 @@ export const generateMatchDayImage = async (state: MatchDayState): Promise<strin
     - Add noise, film grain, and scratches.
     - High contrast lighting.
     - The image should feel raw, intense, and handmade but professional.
+
+    ${FACE_PRESERVATION_RULE}
   `;
 
   return await callGemini(ai, prompt, imagesToSend);
