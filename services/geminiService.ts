@@ -11,11 +11,15 @@ const getAiClient = async () => {
     }
   }
   
-  if (!process.env.API_KEY) {
-      throw new Error("API Key missing. Please select a key.");
+  // Access VITE_API_KEY safely for Vite/Vercel environment
+  // Using (import.meta as any) to avoid TypeScript errors if vite-env types aren't loaded
+  const apiKey = (import.meta as any).env?.VITE_API_KEY;
+  
+  if (!apiKey) {
+      throw new Error("API Key missing. Please ensure VITE_API_KEY is set in your Vercel Environment Variables.");
   }
   
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  return new GoogleGenAI({ apiKey });
 }
 
 export const generateLineupImage = async (state: AppState): Promise<string> => {
