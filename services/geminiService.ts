@@ -307,7 +307,7 @@ export const generateMatchDayImage = async (state: MatchDayState): Promise<strin
     - IDENTITY: Strictly preserve the faces of the uploaded players. This is a face-swap request.
     - ATTIRE: ${kitInstruction}
     - Style: Present them as cut-out figures or "polaroid" snapshots taped onto the background.
-    - Poses: Arms crossed, pointing, or shouting - aggressive & passionate match day energy.
+    - Poses: Arms crossed, hands in pockets, or calm pointing - cold, stoic, and unflappable match day energy.
 
     If NO player source images are provided:
     - Depict a realistic locker room scene. A Nuke FC jersey (deep emerald green with gold accents, matching the specified kit style) is folded over a wooden bench, next to a pair of worn football boots and a duffel bag. The items are draped with ripped tape and paper textures.
