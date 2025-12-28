@@ -78,8 +78,13 @@ export const ScorecardGenerator: React.FC<Props> = ({ onBack }) => {
   const updateScorersString = (details: GoalDetail[]): string => {
     return details
         .map(d => {
-            const p = ROSTER_PLAYERS.find(rp => rp.id === d.playerId);
-            const name = p ? p.name : '';
+            let name = "";
+            if (d.type === 'roster' && d.playerId) {
+                const p = ROSTER_PLAYERS.find(rp => rp.id === d.playerId);
+                name = p ? p.name : "";
+            } else if (d.type === 'custom') {
+                name = d.customName || "";
+            }
             if (!name) return null;
             return d.minute ? `${name} ${d.minute}'` : name;
         })
@@ -100,7 +105,7 @@ export const ScorecardGenerator: React.FC<Props> = ({ onBack }) => {
             // Add empty slots
             const toAdd = score - currentDetails.length;
             for (let i = 0; i < toAdd; i++) {
-                newDetails.push({ playerId: '', minute: '' });
+                newDetails.push({ type: 'roster', playerId: '', customName: '', minute: '' });
             }
         } else if (score < currentDetails.length) {
             // Remove extra slots
@@ -324,28 +329,51 @@ export const ScorecardGenerator: React.FC<Props> = ({ onBack }) => {
                     <label className="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-3 block">
                         Nuke FC Goal Scorers
                     </label>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {state.nukeGoalDetails.map((goal, idx) => (
-                            <div key={idx} className="flex gap-2">
-                                <select
-                                    value={goal.playerId}
-                                    onChange={(e) => handleGoalDetailChange(idx, 'playerId', e.target.value)}
-                                    className="flex-1 bg-slate-800 text-white font-oswald text-sm border border-slate-700 rounded px-3 py-2 outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
-                                >
-                                    <option value="" disabled>Select Scorer (Goal {idx + 1})</option>
-                                    {ROSTER_PLAYERS.map((p) => (
-                                        <option key={p.id} value={p.id}>
-                                            {p.name} #{p.number}
-                                        </option>
-                                    ))}
-                                </select>
-                                <input
-                                    type="text"
-                                    placeholder="Min'"
-                                    value={goal.minute}
-                                    onChange={(e) => handleGoalDetailChange(idx, 'minute', e.target.value)}
-                                    className="w-20 bg-slate-800 text-white font-oswald text-sm border border-slate-700 rounded px-3 py-2 outline-none focus:border-[#D4AF37] text-center"
-                                />
+                            <div key={idx} className="bg-slate-900/50 p-3 rounded-lg border border-slate-800 space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[10px] text-emerald-500 font-oswald uppercase tracking-widest">Goal {idx + 1}</span>
+                                    <select
+                                        value={goal.type}
+                                        onChange={(e) => handleGoalDetailChange(idx, 'type', e.target.value)}
+                                        className="bg-slate-950 text-[10px] text-slate-400 border border-slate-800 rounded px-2 py-0.5 outline-none"
+                                    >
+                                        <option value="roster">Roster</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+                                <div className="flex gap-2">
+                                    {goal.type === 'roster' ? (
+                                        <select
+                                            value={goal.playerId || ''}
+                                            onChange={(e) => handleGoalDetailChange(idx, 'playerId', e.target.value)}
+                                            className="flex-1 bg-slate-800 text-white font-oswald text-sm border border-slate-700 rounded px-3 py-2 outline-none focus:border-[#D4AF37]"
+                                        >
+                                            <option value="" disabled>Select Scorer</option>
+                                            {ROSTER_PLAYERS.map((p) => (
+                                                <option key={p.id} value={p.id}>
+                                                    {p.name} #{p.number}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <input
+                                            type="text"
+                                            placeholder="ENTER NAME"
+                                            value={goal.customName || ''}
+                                            onChange={(e) => handleGoalDetailChange(idx, 'customName', e.target.value)}
+                                            className="flex-1 bg-slate-800 text-white font-oswald text-sm border border-slate-700 rounded px-3 py-2 outline-none focus:border-[#D4AF37] uppercase"
+                                        />
+                                    )}
+                                    <input
+                                        type="text"
+                                        placeholder="Min'"
+                                        value={goal.minute}
+                                        onChange={(e) => handleGoalDetailChange(idx, 'minute', e.target.value)}
+                                        className="w-20 bg-slate-800 text-white font-oswald text-sm border border-slate-700 rounded px-3 py-2 outline-none focus:border-[#D4AF37] text-center"
+                                    />
+                                </div>
                             </div>
                         ))}
                     </div>

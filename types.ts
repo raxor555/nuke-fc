@@ -16,7 +16,9 @@ export interface SelectedPlayerSlot {
 }
 
 export interface GoalDetail {
-  playerId: string;
+  type: 'roster' | 'custom';
+  playerId?: string;
+  customName?: string;
   minute: string;
 }
 

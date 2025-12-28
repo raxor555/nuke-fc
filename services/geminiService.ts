@@ -157,8 +157,14 @@ export const generateScorecardImage = async (state: ScorecardState): Promise<str
   // Build Vertical Lists for Scorers
   const nukeScorersList = state.nukeGoalDetails
     .map(d => {
-        const p = ROSTER_PLAYERS.find(rp => rp.id === d.playerId);
-        return p ? `${p.name} ${d.minute}'` : null;
+        let name = "";
+        if (d.type === 'roster' && d.playerId) {
+            const p = ROSTER_PLAYERS.find(rp => rp.id === d.playerId);
+            name = p ? p.name : "";
+        } else if (d.type === 'custom') {
+            name = d.customName || "";
+        }
+        return name ? `${name} ${d.minute}'` : null;
     })
     .filter(Boolean)
     .join('\n');
