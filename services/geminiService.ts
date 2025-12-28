@@ -1,5 +1,6 @@
+
 import { GoogleGenAI } from "@google/genai";
-import { AppState, ROSTER_PLAYERS, FORMATION_CONFIG, ScorecardState, MatchDayState } from "../types";
+import { AppState, ROSTER_PLAYERS, FORMATION_CONFIG, ScorecardState, MatchDayState, SelectedPlayerSlot } from "../types";
 
 // Strict Face Preservation Rule
 const FACE_PRESERVATION_RULE = `
@@ -22,7 +23,6 @@ const getAiClient = async () => {
   }
   
   // Access VITE_API_KEY safely for Vite/Vercel environment
-  // Using (import.meta as any) to avoid TypeScript errors if vite-env types aren't loaded
   const apiKey = (import.meta as any).env?.VITE_API_KEY;
   
   if (!apiKey) {
@@ -32,16 +32,7 @@ const getAiClient = async () => {
   return new GoogleGenAI({ apiKey });
 }
 
-export const generateLineupImage = async (state: AppState): Promise<string> => {
-  const ai = await getAiClient();
-
-  // Construct the Prompt
-  const romanNumeral = state.mode === '5v5' ? 'V' : 'VI';
-  
-  let playersListString = "";
-  
-  // Map slots to actual strings with roles
-  state.slots.forEach((slot, index) => {
+const getPlayerString = (slot: SelectedPlayerSlot) => {
     let pName = "";
     let pNum = "";
 
@@ -55,6 +46,21 @@ export const generateLineupImage = async (state: AppState): Promise<string> => {
       pName = (slot.customName || "PLAYER").toUpperCase();
       pNum = slot.customNumber || "00";
     }
+    return pName ? `${pName} [${pNum}]` : "";
+};
+
+export const generateLineupImage = async (state: AppState): Promise<string> => {
+  const ai = await getAiClient();
+
+  // Construct the Prompt
+  const romanNumeral = state.mode === '5v5' ? 'V' : 'VI';
+  
+  let playersListString = "";
+  
+  // Map starting slots
+  state.slots.forEach((slot, index) => {
+    const playerStr = getPlayerString(slot);
+    if (!playerStr) return;
 
     // Determine Role
     let role = "Player";
@@ -67,10 +73,14 @@ export const generateLineupImage = async (state: AppState): Promise<string> => {
       }
     }
 
-    if (pName) {
-        playersListString += `Position: ${role} - Name: ${pName} [${pNum}]\n`;
-    }
+    playersListString += `Position: ${role} - Name: ${playerStr}\n`;
   });
+
+  // Map substitutes
+  const subsListString = state.substitutes
+    .map(slot => getPlayerString(slot))
+    .filter(s => s !== "")
+    .join(', ');
 
   const venueText = `${state.venue.toUpperCase()} • NUKE FC 2025`;
   
@@ -113,17 +123,21 @@ export const generateLineupImage = async (state: AppState): Promise<string> => {
     It must read: "STARTING ${romanNumeral}" (e.g. STARTING V or STARTING VI).
     Style: The word "STARTING" should be in a sleek, condensed sans-serif font (like Oswald), tracked wide (spaced out). 
     The Roman Numeral "${romanNumeral}" should be larger, bold, and Metallic Gold (serif or block style), positioned prominently next to or below "STARTING".
-    The header must look like an official broadcast or Instagram editorial graphic title.
 
     MAIN CONTENT: 
     A realistic football pitch viewed from a top-down or slight isometric perspective with jerseys arranged in a ${state.formation} formation.
     Jersey Design: Premium white home jerseys with emerald green accents and gold trim.
-    Jersey Details: Each jersey displays the player's name and number on the back in the exact typography style of professional football kits.
-    Formation: The jerseys must be positioned according to a ${state.formation} tactical formation on a photorealistic pitch.
+    Jersey Details: Each jersey displays the player's name and number on the back.
+    Formation: The jerseys must be positioned according to a ${state.formation} tactical formation.
     
-    PLAYER ROLES & POSITIONS: 
+    PLAYER ROLES & POSITIONS (Starting Lineup): 
     ${playersListString}
-    Ensure the player jerseys are arranged logically on the pitch according to their defined roles (Goalkeeper in goal, Defenders at back, etc.).
+
+    SUBSTITUTES SECTION:
+    On the right or left side of the graphic, create a clean, elegant "SUBSTITUTES" list.
+    Header: "SUBSTITUTES" in small, tracked-out gold sans-serif text.
+    List: ${subsListString || "None listed"}
+    Style: The substitute names should be in a clean white font, stacked vertically or in a neat block.
 
     Visual Effects: Subtle shadows beneath each jersey, realistic fabric texture, and proper depth perspective.
     
@@ -134,8 +148,6 @@ export const generateLineupImage = async (state: AppState): Promise<string> => {
     Dark, moody stadium atmosphere with dramatic lighting focused on the pitch.
     Emerald green smoke or mist rising from the pitch edges.
     Gold particles floating in the air above the jerseys.
-    The jerseys and text must be legible, sharp, and look like professional graphic design elements.
-    Focus on creating a premium, editorial "Lineup Reveal" graphic that showcases the team formation through realistic kit visualization.
 
     ${FACE_PRESERVATION_RULE}
   `;

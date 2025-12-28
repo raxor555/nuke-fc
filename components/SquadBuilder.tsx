@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { AppState, SelectedPlayerSlot, SquadMode, FORMATION_CONFIG } from '../types';
+import { AppState, SelectedPlayerSlot, SquadMode, FORMATION_CONFIG, ROSTER_PLAYERS } from '../types';
 import { PlayerSlotInput } from './PlayerSlotInput';
 import { generateLineupImage } from '../services/geminiService';
 
@@ -20,6 +20,12 @@ const IconDownload = () => (
 const IconSparkles = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+  </svg>
+);
+
+const IconPlus = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
   </svg>
 );
 
@@ -50,6 +56,7 @@ export const SquadBuilder: React.FC<Props> = ({ onBack }) => {
     mode: '5v5',
     venue: 'Al Maktoum Arena',
     slots: Array(5).fill(null).map((_, i) => ({ id: `slot-${i}`, playerType: 'roster' })),
+    substitutes: [],
     generatedImageUrl: null,
     isGenerating: false,
     error: null,
@@ -91,6 +98,27 @@ export const SquadBuilder: React.FC<Props> = ({ onBack }) => {
     const newSlots = [...state.slots];
     newSlots[index] = updatedSlot;
     setState(prev => ({ ...prev, slots: newSlots }));
+  };
+
+  const addSubstitute = () => {
+    setState(prev => ({
+      ...prev,
+      substitutes: [...prev.substitutes, { id: `sub-${Date.now()}`, playerType: 'roster' }]
+    }));
+  };
+
+  const removeSubstitute = (index: number) => {
+    setState(prev => {
+      const newSubs = [...prev.substitutes];
+      newSubs.splice(index, 1);
+      return { ...prev, substitutes: newSubs };
+    });
+  };
+
+  const updateSubstitute = (index: number, updatedSlot: SelectedPlayerSlot) => {
+    const newSubs = [...state.substitutes];
+    newSubs[index] = updatedSlot;
+    setState(prev => ({ ...prev, substitutes: newSubs }));
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,7 +219,7 @@ export const SquadBuilder: React.FC<Props> = ({ onBack }) => {
         </div>
 
         {/* Form Content */}
-        <div className="p-6 flex-1 space-y-8">
+        <div className="p-6 flex-1 space-y-8 pb-32">
           
           {/* Section: Mode & Formation */}
           <div className="grid grid-cols-2 gap-4">
@@ -290,6 +318,35 @@ export const SquadBuilder: React.FC<Props> = ({ onBack }) => {
              </div>
           </div>
 
+          {/* Section: Substitutes */}
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <label className="text-xs text-[#D4AF37] uppercase tracking-widest font-semibold block">Substitutes</label>
+              <button 
+                onClick={addSubstitute}
+                className="flex items-center gap-1 text-[10px] font-oswald uppercase bg-[#046A38] text-white px-2 py-1 rounded hover:bg-[#058444] transition-colors"
+              >
+                <IconPlus /> Add Sub
+              </button>
+            </div>
+            <div className="space-y-1">
+               {state.substitutes.length === 0 ? (
+                 <p className="text-[10px] text-slate-600 italic text-center py-4 border border-dashed border-slate-800 rounded">No substitutes added</p>
+               ) : (
+                 state.substitutes.map((slot, idx) => (
+                   <PlayerSlotInput 
+                     key={slot.id} 
+                     index={idx} 
+                     slot={slot} 
+                     label={`Substitute ${idx + 1}`}
+                     onChange={(updated) => updateSubstitute(idx, updated)} 
+                     onRemove={() => removeSubstitute(idx)}
+                   />
+                 ))
+               )}
+            </div>
+          </div>
+
           {/* Section: Venue */}
           <div>
             <label className="text-xs text-slate-400 uppercase tracking-widest font-semibold mb-3 block">Venue Details</label>
@@ -305,7 +362,7 @@ export const SquadBuilder: React.FC<Props> = ({ onBack }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-slate-800 bg-slate-950 sticky bottom-0 z-20">
+        <div className="p-6 border-t border-slate-800 bg-slate-950 sticky bottom-0 z-20 mt-auto">
           {state.error && (
             <div className="mb-4 p-3 bg-red-900/20 border border-red-800 text-red-200 text-xs rounded">
               {state.error}

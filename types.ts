@@ -26,6 +26,7 @@ export interface AppState {
   mode: SquadMode;
   venue: string;
   slots: SelectedPlayerSlot[];
+  substitutes: SelectedPlayerSlot[];
   generatedImageUrl: string | null;
   isGenerating: boolean;
   error: string | null;
@@ -83,6 +84,7 @@ export const ROSTER_PLAYERS: Player[] = [
   { id: '19-abbad', name: 'Abbad', number: '19' },
   { id: '99-talha', name: 'Talha', number: '99' },
   { id: '22-suleyman', name: 'Suleyman', number: '22' },
+  { id: '17-ammar', name: 'Ammar', number: '17' },
 ];
 
 // Configuration maps formation names to role arrays (excluding Goalkeeper which is always index 0)
